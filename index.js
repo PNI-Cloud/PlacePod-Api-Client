@@ -51,6 +51,7 @@ async function app1(httpClient) {
             const { id } = await v1.sensorApi.create({
                 id: sensorId,
                 name: `client-app1-test-${sensorId}`,
+                type: 'api-client-test',
             });
 
             // Resend the uplink.
@@ -91,13 +92,13 @@ async function app3(httpClient) {
     const sensor1Id = (await v1.sensorApi.create({
         id: 'EEEE33336666FFFF',
         name: 'client-test-sensor1-new',
-        type: 'testing',
+        type: 'api-client-test',
         parkingLotId,
     })).id;
     const sensor2Id = (await v1.sensorApi.create({
         id: '8888AAAA22220000',
         name: 'client-test-sensor2-new',
-        type: 'testing',
+        type: 'api-client-test',
         parkingLotId,
     })).id;
     const laneId = (await v1.laneApi.create({
@@ -114,7 +115,7 @@ async function app3(httpClient) {
     await v1.sensorApi.get(sensor1Id);
     await v1.sensorApi.get(sensor2Id);
     await v1.laneApi.get(laneId);
-    await v1.parkingLotApi.getSensors(parkingLotId, { type: 'testing' });
+    await v1.parkingLotApi.getSensors(parkingLotId, { type: 'api-client-test' });
     await v1.parkingLotApi.getLanes(parkingLotId);
     await v1.laneApi.getSensors(laneId);
 
@@ -168,11 +169,11 @@ async function app3(httpClient) {
     const sensor3Id = (await v1.sensorApi.create({
         id: '00000000FFFFFFFF',
         name: 'client-test-sensor3-presence',
-        type: 'testing',
+        type: 'api-client-test',
         parkingLotId,
     })).id;
     await v1.sensorApi.ttnUplink({
-        dev_id: sensor3Id,
+        hardware_serial: sensor3Id,
         port: 3,
         counter: 1,
         payload_raw: 'AmcAwhVmAQ==',
@@ -208,6 +209,38 @@ async function app3(httpClient) {
         dr: 'SF10 BW125 4/5',
         rssi: -39,
         snr: 1.942,
+    });
+    await v1.sensorApi.chirpStackUplink({
+        applicationID: '1',
+        applicationName: 'test-app',
+        deviceName: 'test-devie',
+        devEUI: sensor3Id,
+        rxInfo: [{
+            gatewayID: '0000000000000002',
+            time: new Date().toISOString(),
+            uplinkID: '0',
+            name: 'test-gateway',
+            rssi: -43,
+            loRaSNR: 3.2,
+            location: {
+                latitude: 0,
+                longitude: 0,
+                altitude: 0,
+            },
+        }],
+        txInfo: {
+            frequency: 902300000,
+            dr: 2,
+        },
+        adr: false,
+        fCnt: 4,
+        fPort: 3,
+        data: 'N2YB',
+        object: {
+            presenceSensor: {
+                55: 1,
+            },
+        },
     });
 
     // Check results.

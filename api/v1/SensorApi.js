@@ -107,7 +107,7 @@ class SensorApi {
 
     /**
      * @param {{
-     *  dev_id: string,
+     *  hardware_serial: string,
      *  port: number,
      *  counter: number,
      *  payload_raw: string,
@@ -164,6 +164,30 @@ class SensorApi {
     async loriotUplink(body) {
         /** @type {{ message: string }} */
         const res = await this.httpClient.post(`${this.baseRoute}/uplink/loriot`, body);
+        return res;
+    }
+
+    /**
+     * @param {{
+     *  devEUI: string,
+     *  rxInfo: [{
+     *      gatewayID: string,
+     *      time: string|Date,
+     *      rssi: number,
+     *      loRaSNR: number,
+     *  }],
+     *  txInfo: {
+     *      frequency: number,
+     *      dr: number,
+     *  },
+     *  fCnt: number,
+     *  fPort: number,
+     *  data: string,
+     * }} body
+     */
+    async chirpStackUplink(body) {
+        /** @type {{ message: string }} */
+        const res = await this.httpClient.post(`${this.baseRoute}/uplink/chirpstack`, body);
         return res;
     }
 
